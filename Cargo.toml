@@ -1,0 +1,21 @@
+[package]
+name = "neural_network"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[features]
+default = ["serde", "parallel"]
+serde = ["dep:serde", "ndarray/serde-1"]
+parallel = ["dep:rayon"]
+
+[dependencies]
+# ML
+ndarray = "0.15"
+rand = "0.8"
+
+# Serialization
+serde = { version = "1", features = ["derive"], optional = true }
+
+# Parallelism
+rayon = { version = "1", optional = true }
