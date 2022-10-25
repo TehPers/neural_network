@@ -20,7 +20,7 @@ impl<Scalar> Forward<Scalar> for Box<dyn Forward<Scalar>> {
 }
 
 /// A layer that can be updated by backpropagating gradients.
-pub trait Backward<Scalar = f64>: Forward<Scalar> {
+pub trait Layer<Scalar = f64>: Forward<Scalar> {
     /// Backpropagates the gradient. The input must be the value that was passed to
     /// [`Forward::forward`] to calculate the gradient.
     fn backward(
@@ -31,35 +31,13 @@ pub trait Backward<Scalar = f64>: Forward<Scalar> {
     ) -> Array1<Scalar>;
 }
 
-impl<Scalar> Forward<Scalar> for Box<dyn Backward<Scalar>> {
-    fn forward(&self, input: Array1<Scalar>) -> Array1<Scalar> {
-        self.as_ref().forward(input)
-    }
-}
-
-impl<Scalar> Backward<Scalar> for Box<dyn Backward<Scalar>> {
-    fn backward(
-        &mut self,
-        inputs: Array1<Scalar>,
-        gradient: Array1<Scalar>,
-        learning_rate: Scalar,
-    ) -> Array1<Scalar> {
-        self.as_mut().backward(inputs, gradient, learning_rate)
-    }
-}
-
-/// A layer in a neural network.
-pub trait Layer<Scalar = f64>: Forward<Scalar> + Backward<Scalar> {}
-
-impl<L, Scalar> Layer<Scalar> for L where L: Forward<Scalar> + Backward<Scalar> {}
-
 impl<Scalar> Forward<Scalar> for Box<dyn Layer<Scalar>> {
     fn forward(&self, input: Array1<Scalar>) -> Array1<Scalar> {
         self.as_ref().forward(input)
     }
 }
 
-impl<Scalar> Backward<Scalar> for Box<dyn Layer<Scalar>> {
+impl<Scalar> Layer<Scalar> for Box<dyn Layer<Scalar>> {
     fn backward(
         &mut self,
         inputs: Array1<Scalar>,
@@ -143,7 +121,7 @@ where
     }
 }
 
-impl<A, Scalar> Backward<Scalar> for ActivationLayer<A>
+impl<A, Scalar> Layer<Scalar> for ActivationLayer<A>
 where
     A: ActivationFn<Scalar>,
     Scalar: LinalgScalar,
@@ -214,7 +192,7 @@ where
     }
 }
 
-impl Backward for DenseLayer {
+impl Layer for DenseLayer {
     /// Calculates the gradient of the loss with respect to the inputs, and updates the weights and
     /// biases.
     fn backward(
