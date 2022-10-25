@@ -162,8 +162,8 @@ where
         // Train on each batch
         let mut total_loss = 0.0;
         for batch in self.example_indices.chunks(self.training_opts.batch_size) {
-            let mut gradients = Vec::with_capacity(self.training_opts.batch_size);
-            let mut batch_inputs = Vec::with_capacity(self.training_opts.batch_size);
+            let mut gradients = Vec::with_capacity(batch.len());
+            let mut batch_inputs = Vec::with_capacity(batch.len());
             for &example_index in batch {
                 let example = &self.examples[example_index];
 
