@@ -9,7 +9,7 @@ use crate::{
 use super::{CostFn, Forward};
 
 /// A neural network.
-#[derive(Debug)]
+#[derive(Clone, PartialEq, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct NeuralNetwork<L = Box<dyn Layer>> {
     /// The layers of the network.
